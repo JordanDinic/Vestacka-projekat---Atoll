@@ -1,0 +1,98 @@
+Cilj treće faze je proširenje implementacije igre Atol tako da podrži igranje čovek protiv računara,
+pri čemu računar donosi odluke koristeći algoritam pretraživanja prostora stanja. Fokus ove faze je:
+- pronalaženje optimalnog (ili dovoljno dobrog) poteza,
+- ograničavanje pretrage na razumnu dubinu,
+- korišćenje heuristike za procenu stanja kada se ne može doći do terminalnog stanja u zadatoj dubini.
+
+Motivacija: broj mogućih poteza je velik, pa je potpuno pretraživanje do kraja neizvodljivo.
+Zbog toga se koristi Min-Max sa alfa-beta odsecanjem i heuristikom.
+
+
+	Šta je dodato / promenjeno u odnosu na fazu II
+
+Dodato (Faza III):
+1) Režimi igre:
+   - Čovek vs Čovek
+   - Čovek vs Računar
+
+2) Parametri igre za AI:
+   - izbor ko igra prvi (X/O)
+   - izbor za kog igra računar (X/O)
+   - izbor dubine pretrage (tipično 1–4)
+
+3) AI modul:
+   - Minimax algoritam
+   - Alfa-beta odsecanje
+   - heuristička procena stanja
+
+4) Integracija AI u GUI:
+   - kada je AI na potezu, potez se odigra automatski
+   - klikovi se ignorišu dok AI igra
+   - nakon pobede ispisuje se pobednik i igra se zaključava
+
+Promenjeno iz ranijih faza:
+- dodati su pozivi AI logike u tok igre (game-loop)
+
+
+	Objašnjenje algoritma Minimax
+
+Minimax se koristi za igre sa dva igrača sa suprotnim interesima (zero-sum).
+Ideja:
+- “Max” (računar) bira poteze koji maksimizuju vrednost stanja
+- “Min” (protivnik) bira poteze koji minimizuju vrednost stanja
+
+Algoritam gradi stablo pretrage:
+- čvor: stanje table
+- grana: potez (prelaz u novo stanje)
+- nivo: potez jednog igrača
+
+Kada se dostigne terminalno stanje (pobeda) ili maksimalna dubina, stanje se ocenjuje
+(terminalno direktno, inače preko heuristike), a vrednosti se propagiraju nazad do korena.
+
+
+ 	Alfa-beta odsecanje
+
+Alfa-beta odsecanje optimizuje Minimax smanjujući broj čvorova koje je potrebno evaluirati.
+
+Uvode se:
+- alfa (α): najbolja vrednost koju Max može već da garantuje
+- beta (β): najbolja vrednost koju Min može već da garantuje
+
+Ako u nekom trenutku postane jasno da grana ne može poboljšati rezultat (α >= β),
+dalje pretraživanje te grane se prekida (odseca).
+
+
+	Terminalna stanja (kraj igre)
+
+Kraj igre se proverava pravilom pobede Atoll-a:
+- igrač pobeđuje ako poveže dva ili više svojih ostrva tako da
+  “najmanji broj ostrva prebrisanih po obodu” (CW/CCW do poslednjeg ostrva komponente) bude ≥ 7.
+
+U terminalnom stanju heuristika nije potrebna:
+- pobeda za Max: velika pozitivna vrednost
+- pobeda za Min: velika negativna vrednost
+
+
+	Heuristika – procena stanja
+
+
+Pošto je pretraga ograničena dubinom, koristi se heuristika koja procenjuje “koliko je stanje dobro”.
+
+Osnovna heuristika je zasnovana na dominaciji obodom (isto pravilo koje vodi ka pobedi):
+- za igrača P pronalaze se povezane komponente njegovih ostrva (komponente sa >= 2 ostrva)
+- heuristička vrednost stanja je razlika:
+    H = score(P) - score(opponent)
+
+
+	Izbor dubine i performanse
+
+- dubina 1: brzo, ali slabo planiranje
+- dubina 2: osnovno taktičko ponašanje
+- dubina 3–4: znatno bolja igra, ali sporije (više čvorova)
+
+	Zaključak
+
+U trećoj fazi projekat je proširen na igranje protiv računara.
+Implementirani su Minimax sa alfa-beta odsecanjem i heuristika bazirana na “dominaciji obodom”,
+kao i integracija AI u tok igre uz izbor režima i parametara.
+
